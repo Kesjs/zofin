@@ -1,42 +1,90 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ProgressBar } from './ProgressBar'; // adapte le chemin si besoin
 
-type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'payment' | 'confirmation';
+type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'summary' | 'payment' | 'confirmation';
 
-const stepTitles: Record<Step, string> = {
-  intro: 'Bienvenue',
-  conditions: 'Conditions Générales',
-  form: 'Formulaire de demande',
-  documents: 'Upload des documents',
-  payment: 'Paiement',
-  confirmation: 'Confirmation',
-};
+const LOCAL_STORAGE_KEY = 'pretAutoData';
 
 const MAX_FILE_SIZE_MB = 5;
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
 const PretAuto: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<Step>('intro');
-
-  // Données globales du prêt
   const [isAccepted, setIsAccepted] = useState(false);
   const [nom, setNom] = useState('');
+  const [email, setEmail] = useState('');
+  const [telephone, setTelephone] = useState('');
+  const [adresse, setAdresse] = useState('');
+  const [codePostal, setCodePostal] = useState('');
+  const [ville, setVille] = useState('');
   const [montant, setMontant] = useState('');
   const [duree, setDuree] = useState('');
   const [documents, setDocuments] = useState<File[]>([]);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [docError, setDocError] = useState('');
 
-  // Animation variants pour framer-motion
+  // Sauvegarde automatique dans le localStorage à chaque changement
+  useEffect(() => {
+    const data = {
+      currentStep,
+      isAccepted,
+      nom,
+      email,
+      telephone,
+      adresse,
+      codePostal,
+      ville,
+      montant,
+      duree,
+      paymentConfirmed,
+    };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+  }, [
+    currentStep,
+    isAccepted,
+    nom,
+    email,
+    telephone,
+    adresse,
+    codePostal,
+    ville,
+    montant,
+    duree,
+    paymentConfirmed,
+  ]);
+
+  // Restauration automatique au chargement
+  useEffect(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setCurrentStep(data.currentStep || 'intro');
+        setIsAccepted(data.isAccepted || false);
+        setNom(data.nom || '');
+        setEmail(data.email || '');
+        setTelephone(data.telephone || '');
+        setAdresse(data.adresse || '');
+        setCodePostal(data.codePostal || '');
+        setVille(data.ville || '');
+        setMontant(data.montant || '');
+        setDuree(data.duree || '');
+        setPaymentConfirmed(data.paymentConfirmed || false);
+      } catch {
+        // ignore erreur de parsing
+      }
+    }
+  }, []);
+
   const variants = {
     enter: { opacity: 0, x: 100 },
     center: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -100 },
   };
 
-  // Utiliser useCallback pour éviter recréation inutile
   const nextStep = useCallback(() => {
     setCurrentStep((prev) => {
       switch (prev) {
@@ -50,20 +98,20 @@ const PretAuto: React.FC = () => {
     });
   }, []);
 
-  const prevStep = useCallback(() => {
-    setCurrentStep((prev) => {
-      switch (prev) {
-        case 'confirmation': return 'payment';
-        case 'payment': return 'documents';
-        case 'documents': return 'form';
-        case 'form': return 'conditions';
-        case 'conditions': return 'intro';
-        default: return prev;
-      }
-    });
-  }, []);
+const prevStep = useCallback(() => {
+  setCurrentStep((prev) => {
+    switch (prev) {
+      case 'confirmation': return 'payment';
+      case 'payment': return 'summary';   // <-- ici aussi
+      case 'summary': return 'documents'; // <-- étape résumé avant paiement
+      case 'documents': return 'form';
+      case 'form': return 'conditions';
+      case 'conditions': return 'intro';
+      default: return prev;
+    }
+  });
+}, []);
 
-  // Gestion conditions
   const handleAcceptConditions = () => {
     if (!isAccepted) {
       alert("Vous devez accepter les conditions pour continuer.");
@@ -72,7 +120,6 @@ const PretAuto: React.FC = () => {
     nextStep();
   };
 
-  // Validation formulaire demande
   const handleSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nom.trim() || !montant || !duree) {
@@ -82,24 +129,20 @@ const PretAuto: React.FC = () => {
     nextStep();
   };
 
-  // Gestion ajout fichiers (cumulatif)
   const handleDocumentsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDocError('');
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-
       const tooLarge = newFiles.some(f => f.size > MAX_FILE_SIZE_MB * 1024 * 1024);
       if (tooLarge) {
         setDocError(`Un ou plusieurs fichiers dépassent la taille maximale de ${MAX_FILE_SIZE_MB} Mo.`);
         return;
       }
-
       const invalidType = newFiles.some(f => !ALLOWED_TYPES.includes(f.type));
       if (invalidType) {
         setDocError('Seuls les fichiers PDF, JPEG et PNG sont autorisés.');
         return;
       }
-
       setDocuments(prev => {
         const existingIds = new Set(prev.map(f => f.name + f.size));
         const filteredNew = newFiles.filter(f => !existingIds.has(f.name + f.size));
@@ -130,18 +173,25 @@ const PretAuto: React.FC = () => {
   const resetAll = () => {
     setIsAccepted(false);
     setNom('');
+    setEmail('');
+    setTelephone('');
+    setAdresse('');
+    setCodePostal('');
+    setVille('');
     setMontant('');
     setDuree('');
     setDocuments([]);
     setPaymentConfirmed(false);
     setDocError('');
     setCurrentStep('intro');
+    localStorage.removeItem(LOCAL_STORAGE_KEY); // Efface la sauvegarde
   };
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
       <div className="max-w-lg w-full p-6 bg-white rounded shadow-lg">
         <h2 className="text-3xl font-bold text-center text-yellow-600 mb-4">Prêt Auto</h2>
+        <ProgressBar currentStep={currentStep} /><br></br>
         <AnimatePresence mode="wait">
           {currentStep === 'intro' && (
             <motion.div
@@ -155,34 +205,30 @@ const PretAuto: React.FC = () => {
               <p className="text-gray-700 mb-6">
                 Bienvenue sur notre service de demande de prêt auto. Ce processus comporte plusieurs étapes pour garantir la validité de votre dossier.
               </p>
-
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold text-blue-900 mb-2">Roulez vers la liberté</h1>
-          <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
-          <p className="text-gray-700">
-            Que vous souhaitiez acquérir un véhicule neuf ou d’occasion, le prêt auto est la solution idéale pour financer votre achat sans délai.
-            Simplifiez vos démarches et repartez au volant de votre voiture en toute sérénité.
-          </p>
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold text-blue-900 mb-2">Des conditions flexibles</h1>
-          <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
-          <p className="text-gray-700">
-            Profitez d’un crédit auto à taux avantageux, avec des mensualités adaptées à votre budget. Que ce soit pour une voiture de ville, un SUV ou un véhicule utilitaire, 
-            notre offre s’adapte à vos besoins spécifiques.
-          </p>
-        </div>
-
-        <div className="mb-6">
-          <h1 className="text-xl font-semibold text-blue-900 mb-2">Obtenez votre financement rapidement</h1>
-          <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
-          <p className="text-gray-700">
-            Grâce à un processus de demande rapide et 100% en ligne, votre prêt peut être accordé en quelques jours seulement. 
-            Passez à l’action sans attendre et réalisez votre projet automobile dès aujourd’hui.
-          </p>
-        </div>
-
+              <div className="mb-6">
+  <h1 className="text-xl font-semibold text-blue-900 mb-2">🚗 Roulez vers la liberté</h1>
+                <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
+                <p className="text-gray-700">
+                  Que vous souhaitiez acquérir un véhicule neuf ou d’occasion, le prêt auto est la solution idéale pour financer votre achat sans délai.
+                  Simplifiez vos démarches et repartez au volant de votre voiture en toute sérénité.
+                </p>
+              </div>
+              <div className="mb-6">
+  <h1 className="text-xl font-semibold text-blue-900 mb-2">🔄 Des conditions flexibles</h1>
+                <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
+                <p className="text-gray-700">
+                  Profitez d’un crédit auto à taux avantageux, avec des mensualités adaptées à votre budget. Que ce soit pour une voiture de ville, un SUV ou un véhicule utilitaire, 
+                  notre offre s’adapte à vos besoins spécifiques.
+                </p>
+              </div>
+              <div className="mb-6">
+  <h1 className="text-xl font-semibold text-blue-900 mb-2">⚡ Obtenez votre financement rapidement</h1>
+                <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
+                <p className="text-gray-700">
+                  Grâce à un processus de demande rapide et 100% en ligne, votre prêt peut être accordé en quelques jours seulement. 
+                  Passez à l’action sans attendre et réalisez votre projet automobile dès aujourd’hui.
+                </p>
+              </div>
               <button
                 onClick={() => setCurrentStep('conditions')}
                 className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
@@ -209,6 +255,14 @@ const PretAuto: React.FC = () => {
                 <p>• Le prêt est soumis à validation de votre dossier.</p>
                 <p>• Les documents demandés sont obligatoires pour traitement.</p>
                 <p>• Les frais de dossier seront à régler à la fin du processus.</p>
+                <p>• Vous devez être majeur et résident en France.</p>
+                <p>• Le montant et la durée du prêt sont à définir selon votre situation.</p>
+                <p>• En cas de non-remboursement, des pénalités peuvent s'appliquer.</p>
+                <p>• Nous nous engageons à protéger vos données personnelles.</p>
+                <p>• Vous pouvez annuler votre demande à tout moment avant le paiement.</p>
+                <p>• Pour toute question, contactez notre service client.</p>
+                <p>• En cas de litige, le tribunal compétent sera celui de votre domicile.</p>
+                <p>• Nous nous réservons le droit de modifier ces conditions à tout moment.</p>
               </div>
               <label className="inline-flex items-center mb-6 cursor-pointer">
                 <input
@@ -220,6 +274,13 @@ const PretAuto: React.FC = () => {
                 <span className="ml-2 text-gray-700">J'accepte les conditions générales</span>
               </label>
               <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="px-4 py-2 border rounded hover:bg-gray-100 transition"
+                >
+                  Retour
+                </button>
                 <button
                   onClick={handleAcceptConditions}
                   className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
@@ -241,11 +302,70 @@ const PretAuto: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-4">
+                <label className="block text-gray-700 mb-1">Type de prêt</label>
+                <input
+                  type="text"
+                  value="Prêt Automobile"
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-500 cursor-not-allowed"
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block mb-1 text-gray-700">Nom complet</label>
                 <input
                   type="text"
                   value={nom}
                   onChange={(e) => setNom(e.target.value)}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700">Téléphone</label>
+                <input
+                  type="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700">Adresse</label>
+                <input
+                  type="text"
+                  value={adresse}
+                  onChange={(e) => setAdresse(e.target.value)}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700">Code Postal</label>
+                <input
+                  type="text"
+                  value={codePostal}
+                  onChange={(e) => setCodePostal(e.target.value)}
+                  className="w-full border px-3 py-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 text-gray-700">Ville</label>
+                <input
+                  type="text"
+                  value={ville}
+                  onChange={(e) => setVille(e.target.value)}
                   className="w-full border px-3 py-2 rounded"
                   required
                 />
@@ -309,7 +429,6 @@ const PretAuto: React.FC = () => {
                   <li>Relevé d'identité bancaire (RIB)</li>
                 </ul>
               </div>
-
               <label className="block mb-2 text-gray-700 font-semibold">
                 Joignez vos documents (PDF, JPEG, PNG) - max {MAX_FILE_SIZE_MB} Mo chacun :
               </label>
@@ -320,11 +439,9 @@ const PretAuto: React.FC = () => {
                 onChange={handleDocumentsChange}
                 className="mb-2"
               />
-
               {docError && (
                 <p className="mb-2 text-red-600 font-semibold">{docError}</p>
               )}
-
               {documents.length > 0 && (
                 <ul className="mb-4 text-gray-700 text-sm">
                   {documents.map((file, index) => (
@@ -341,7 +458,6 @@ const PretAuto: React.FC = () => {
                   ))}
                 </ul>
               )}
-
               <div className="flex justify-between">
                 <button
                   type="button"
@@ -359,6 +475,76 @@ const PretAuto: React.FC = () => {
               </div>
             </motion.form>
           )}
+
+ {currentStep === 'summary' && (
+  <motion.div
+    key="summary"
+    initial="enter"
+    animate="center"
+    exit="exit"
+    variants={variants}
+    transition={{ duration: 0.3 }}
+    className="space-y-6 px-4 sm:px-6 lg:px-8"
+  >
+    <h3 className="text-lg sm:text-xl font-bold text-blue-900">Récapitulatif de votre demande</h3>
+
+    {/* Infos personnelles */}
+    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+      <h4 className="text-md font-semibold mb-2 text-gray-800">🧍 Informations personnelles</h4>
+      <p className="text-sm sm:text-base"><span className="font-medium">Nom complet :</span> {nom}</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Email :</span> {email}</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Téléphone :</span> {telephone}</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Adresse :</span> {adresse}</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Code Postal :</span> {codePostal}</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Ville :</span> {ville}</p>  
+
+    </div>
+
+    {/* Détails du prêt */}
+    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+      <h4 className="text-md font-semibold mb-2 text-gray-800">💶 Détails du prêt</h4>
+      <p className="text-sm sm:text-base"><span className="font-medium">Montant souhaité :</span> {montant} €</p>
+      <p className="text-sm sm:text-base"><span className="font-medium">Durée du prêt :</span> {duree} mois</p>
+    </div>
+
+    {/* Documents */}
+    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+      <h4 className="text-md font-semibold mb-2 text-gray-800">📎 Documents joints</h4>
+      {documents.length === 0 ? (
+        <p className="text-red-600 text-sm sm:text-base">Aucun document joint</p>
+      ) : (
+        <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
+          {documents.map((file, i) => (
+            <li key={i}>
+              {file.name} – {(file.size / 1024).toFixed(1)} KB
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    {/* Message d'alerte */}
+    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm sm:text-base text-yellow-900 rounded">
+      Veuillez vérifier que toutes les informations ci-dessus sont correctes avant de procéder au paiement.
+    </div>
+
+    {/* Boutons */}
+    <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4">
+      <button
+        onClick={prevStep}
+        className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm sm:text-base"
+      >
+        ← Retour
+      </button>
+      <button
+        onClick={nextStep}
+        className="bg-blue-900 text-white px-6 py-2 rounded hover:bg-yellow-500 transition text-sm sm:text-base"
+      >
+        ✅ Confirmer et payer
+      </button>
+    </div>
+  </motion.div>
+)}
 
           {currentStep === 'payment' && (
             <motion.div
@@ -412,15 +598,15 @@ const PretAuto: React.FC = () => {
               <button
                 onClick={resetAll}
                 className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
-  >
-            Nouvelle demande
-          </button>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-</div>
-);
+              >
+                Nouvelle demande
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
 };
 
 export default PretAuto;

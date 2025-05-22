@@ -10,7 +10,7 @@ import PretPro from './components/PretPro';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Breadcrumb from './components/Breadcrumb';
-import Loader from './components/Loader'; // 👈 Ton nouveau loader
+import Loader from './components/Loader';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 6000); // ⏱️ Durée du chargement (2 secondes ici)
+    }, 3000); 
 
     return () => clearTimeout(timer);
   }, []);

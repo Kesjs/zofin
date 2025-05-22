@@ -19,3 +19,13 @@ html {
     align-items: center;
     text-align: center;
 }
+
+
+/* Masque les scrollbars tout en gardant le scroll tactile */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari and Opera */
+}

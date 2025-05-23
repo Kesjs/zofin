@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressBar } from './ProgressBar'; // adapte le chemin si besoin
 
-type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'summary' | 'payment' | 'confirmation';
+type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'summary' | 'confirmation';
 
 const LOCAL_STORAGE_KEY = 'pretAutoData';
 
@@ -23,7 +23,6 @@ const PretAuto: React.FC = () => {
   const [montant, setMontant] = useState('');
   const [duree, setDuree] = useState('');
   const [documents, setDocuments] = useState<File[]>([]);
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [docError, setDocError] = useState('');
 
   // Sauvegarde automatique dans le localStorage à chaque changement
@@ -39,7 +38,6 @@ const PretAuto: React.FC = () => {
       ville,
       montant,
       duree,
-      paymentConfirmed,
     };
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
   }, [
@@ -53,7 +51,6 @@ const PretAuto: React.FC = () => {
     ville,
     montant,
     duree,
-    paymentConfirmed,
   ]);
 
   // Restauration automatique au chargement
@@ -72,7 +69,6 @@ const PretAuto: React.FC = () => {
         setVille(data.ville || '');
         setMontant(data.montant || '');
         setDuree(data.duree || '');
-        setPaymentConfirmed(data.paymentConfirmed || false);
       } catch {
         // ignore erreur de parsing
       }
@@ -91,26 +87,25 @@ const PretAuto: React.FC = () => {
         case 'intro': return 'conditions';
         case 'conditions': return 'form';
         case 'form': return 'documents';
-        case 'documents': return 'payment';
-        case 'payment': return 'confirmation';
+        case 'documents': return 'summary';
+        case 'summary': return 'confirmation';
         default: return prev;
       }
     });
   }, []);
 
-const prevStep = useCallback(() => {
-  setCurrentStep((prev) => {
-    switch (prev) {
-      case 'confirmation': return 'payment';
-      case 'payment': return 'summary';   // <-- ici aussi
-      case 'summary': return 'documents'; // <-- étape résumé avant paiement
-      case 'documents': return 'form';
-      case 'form': return 'conditions';
-      case 'conditions': return 'intro';
-      default: return prev;
-    }
-  });
-}, []);
+  const prevStep = useCallback(() => {
+    setCurrentStep((prev) => {
+      switch (prev) {
+        case 'confirmation': return 'summary';
+        case 'summary': return 'documents';
+        case 'documents': return 'form';
+        case 'form': return 'conditions';
+        case 'conditions': return 'intro';
+        default: return prev;
+      }
+    });
+  }, []);
 
   const handleAcceptConditions = () => {
     if (!isAccepted) {
@@ -165,11 +160,6 @@ const prevStep = useCallback(() => {
     nextStep();
   };
 
-  const handlePayment = () => {
-    setPaymentConfirmed(true);
-    nextStep();
-  };
-
   const resetAll = () => {
     setIsAccepted(false);
     setNom('');
@@ -181,7 +171,6 @@ const prevStep = useCallback(() => {
     setMontant('');
     setDuree('');
     setDocuments([]);
-    setPaymentConfirmed(false);
     setDocError('');
     setCurrentStep('intro');
     localStorage.removeItem(LOCAL_STORAGE_KEY); // Efface la sauvegarde
@@ -191,7 +180,7 @@ const prevStep = useCallback(() => {
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
       <div className="max-w-lg w-full p-6 bg-white rounded shadow-lg">
         <h2 className="text-3xl font-bold text-center text-yellow-600 mb-4">Prêt Auto</h2>
-        <ProgressBar currentStep={currentStep} /><br></br>
+        <ProgressBar currentStep={currentStep} /><br />
         <AnimatePresence mode="wait">
           {currentStep === 'intro' && (
             <motion.div
@@ -206,7 +195,7 @@ const prevStep = useCallback(() => {
                 Bienvenue sur notre service de demande de prêt auto. Ce processus comporte plusieurs étapes pour garantir la validité de votre dossier.
               </p>
               <div className="mb-6">
-  <h1 className="text-xl font-semibold text-blue-900 mb-2">🚗 Roulez vers la liberté</h1>
+                <h1 className="text-xl font-semibold text-blue-900 mb-2">🚗 Roulez vers la liberté</h1>
                 <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
                 <p className="text-gray-700">
                   Que vous souhaitiez acquérir un véhicule neuf ou d’occasion, le prêt auto est la solution idéale pour financer votre achat sans délai.
@@ -214,7 +203,7 @@ const prevStep = useCallback(() => {
                 </p>
               </div>
               <div className="mb-6">
-  <h1 className="text-xl font-semibold text-blue-900 mb-2">🔄 Des conditions flexibles</h1>
+                <h1 className="text-xl font-semibold text-blue-900 mb-2">🔄 Des conditions flexibles</h1>
                 <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
                 <p className="text-gray-700">
                   Profitez d’un crédit auto à taux avantageux, avec des mensualités adaptées à votre budget. Que ce soit pour une voiture de ville, un SUV ou un véhicule utilitaire, 
@@ -222,7 +211,7 @@ const prevStep = useCallback(() => {
                 </p>
               </div>
               <div className="mb-6">
-  <h1 className="text-xl font-semibold text-blue-900 mb-2">⚡ Obtenez votre financement rapidement</h1>
+                <h1 className="text-xl font-semibold text-blue-900 mb-2">⚡ Obtenez votre financement rapidement</h1>
                 <div className="border-t-4 border-yellow-500 w-16 mb-4"></div>
                 <p className="text-gray-700">
                   Grâce à un processus de demande rapide et 100% en ligne, votre prêt peut être accordé en quelques jours seulement. 
@@ -476,133 +465,141 @@ const prevStep = useCallback(() => {
             </motion.form>
           )}
 
- {currentStep === 'summary' && (
+          {currentStep === 'summary' && (
+            <motion.div
+              key="summary"
+              initial="enter"
+              animate="center"
+              exit="exit"
+              variants={variants}
+              transition={{ duration: 0.3 }}
+              className="space-y-6 px-4 sm:px-6 lg:px-8"
+            >
+              <h3 className="text-lg sm:text-xl font-bold text-blue-900">Récapitulatif de votre demande</h3>
+              <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+                <h4 className="text-md font-semibold mb-2 text-gray-800">🧍 Informations personnelles</h4>
+                <p className="text-sm sm:text-base"><span className="font-medium">Nom complet :</span> {nom}</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Email :</span> {email}</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Téléphone :</span> {telephone}</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Adresse :</span> {adresse}</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Code Postal :</span> {codePostal}</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Ville :</span> {ville}</p>
+              </div>
+              <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+                <h4 className="text-md font-semibold mb-2 text-gray-800">💶 Détails du prêt</h4>
+                <p className="text-sm sm:text-base"><span className="font-medium">Montant souhaité :</span> {montant} €</p>
+                <p className="text-sm sm:text-base"><span className="font-medium">Durée du prêt :</span> {duree} mois</p>
+              </div>
+              <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
+                <h4 className="text-md font-semibold mb-2 text-gray-800">📎 Documents joints</h4>
+                {documents.length === 0 ? (
+                  <p className="text-red-600 text-sm sm:text-base">Aucun document joint</p>
+                ) : (
+                  <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
+                    {documents.map((file, i) => (
+                      <li key={i}>
+                        {file.name} – {(file.size / 1024).toFixed(1)} KB
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm sm:text-base text-yellow-900 rounded">
+                Veuillez vérifier que toutes les informations ci-dessus sont correctes avant de valider votre demande.<br />
+                <span className="font-semibold">La suite de la procédure se fera par email.</span>
+              </div>
+              <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4">
+                <button
+                  onClick={prevStep}
+                  className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm sm:text-base"
+                >
+                  ← Retour
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="bg-blue-900 text-white px-6 py-2 rounded hover:bg-yellow-500 transition text-sm sm:text-base"
+                >
+                  ✅ Envoyer la demande
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+        // ...existing code...
+{currentStep === 'confirmation' && (
   <motion.div
-    key="summary"
+    key="confirmation"
     initial="enter"
     animate="center"
     exit="exit"
     variants={variants}
     transition={{ duration: 0.3 }}
-    className="space-y-6 px-4 sm:px-6 lg:px-8"
   >
-    <h3 className="text-lg sm:text-xl font-bold text-blue-900">Récapitulatif de votre demande</h3>
-
-    {/* Infos personnelles */}
-    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
-      <h4 className="text-md font-semibold mb-2 text-gray-800">🧍 Informations personnelles</h4>
-      <p className="text-sm sm:text-base"><span className="font-medium">Nom complet :</span> {nom}</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Email :</span> {email}</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Téléphone :</span> {telephone}</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Adresse :</span> {adresse}</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Code Postal :</span> {codePostal}</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Ville :</span> {ville}</p>  
-
-    </div>
-
-    {/* Détails du prêt */}
-    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
-      <h4 className="text-md font-semibold mb-2 text-gray-800">💶 Détails du prêt</h4>
-      <p className="text-sm sm:text-base"><span className="font-medium">Montant souhaité :</span> {montant} €</p>
-      <p className="text-sm sm:text-base"><span className="font-medium">Durée du prêt :</span> {duree} mois</p>
-    </div>
-
-    {/* Documents */}
-    <div className="bg-gray-50 border rounded-lg shadow-sm p-4">
-      <h4 className="text-md font-semibold mb-2 text-gray-800">📎 Documents joints</h4>
-      {documents.length === 0 ? (
-        <p className="text-red-600 text-sm sm:text-base">Aucun document joint</p>
-      ) : (
-        <ul className="list-disc ml-5 space-y-1 text-sm text-gray-700">
-          {documents.map((file, i) => (
-            <li key={i}>
-              {file.name} – {(file.size / 1024).toFixed(1)} KB
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-
-    {/* Message d'alerte */}
-    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm sm:text-base text-yellow-900 rounded">
-      Veuillez vérifier que toutes les informations ci-dessus sont correctes avant de procéder au paiement.
-    </div>
-
-    {/* Boutons */}
-    <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4">
-      <button
-        onClick={prevStep}
-        className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100 transition text-sm sm:text-base"
-      >
-        ← Retour
-      </button>
-      <button
-        onClick={nextStep}
-        className="bg-blue-900 text-white px-6 py-2 rounded hover:bg-yellow-500 transition text-sm sm:text-base"
-      >
-        ✅ Confirmer et payer
-      </button>
-    </div>
+    {/* Numéro de dossier généré */}
+    <p className="mb-2 text-sm text-gray-500">
+      Numéro de dossier : <span className="font-mono">{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
+    </p>
+    <h3 className="text-green-700 font-bold mb-4 flex items-center">
+      <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      Demande envoyée avec succès !
+    </h3>
+    <p className="mb-4 text-gray-700">
+      Merci <span className="font-semibold">{nom || "!"}</span>, nous avons bien reçu votre demande.<br />
+      <span className="font-semibold flex items-center mt-2">
+        <svg className="w-5 h-5 mr-1 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16 12H8m8 0a8 8 0 11-16 0 8 8 0 0116 0z" />
+        </svg>
+        La suite de la procédure se fera par email&nbsp;:
+        <a
+          href={`mailto:${email}`}
+          className="ml-1 text-blue-700 underline break-all"
+        >
+          {email || 'votre adresse email'}
+        </a>
+      </span>
+      <br />
+      <span className="block mt-2 text-sm text-gray-600">
+        Merci de vérifier votre boîte de réception (ainsi que les spams ou courriers indésirables) dans les prochaines minutes.<br />
+        Si vous ne recevez rien sous 24h, contactez notre support.<br />
+        <span className="block mt-2">
+          <strong>Délai estimé de traitement :</strong> sous 48h ouvrées.
+        </span>
+        <span className="block mt-2">
+          <a
+            href="mailto:support@votre-domaine.fr"
+            className="text-blue-700 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contacter le support
+          </a>
+          {" "} | {" "}
+          <a
+            href="/faq"
+            className="text-blue-700 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Consulter la FAQ
+          </a>
+        </span>
+        <span className="block mt-2 text-xs text-gray-400">
+          Vos données sont traitées conformément à la réglementation RGPD et ne seront jamais partagées sans votre consentement.
+        </span>
+      </span>
+    </p>
+    <button
+      onClick={resetAll}
+      aria-label="Faire une nouvelle demande de prêt"
+      className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
+    >
+      Nouvelle demande
+    </button>
   </motion.div>
 )}
-
-          {currentStep === 'payment' && (
-            <motion.div
-              key="payment"
-              initial="enter"
-              animate="center"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="mb-4 text-gray-700">
-                Veuillez procéder au paiement des frais de dossier pour que nous puissions traiter votre demande.
-              </p>
-              <p className="mb-6 font-semibold">
-                Montant à payer : 50 € (frais fixes)
-              </p>
-              {!paymentConfirmed ? (
-                <div className="flex justify-between">
-                  <button
-                    onClick={prevStep}
-                    className="px-4 py-2 border rounded hover:bg-gray-100 transition"
-                  >
-                    Retour
-                  </button>
-                  <button
-                    onClick={handlePayment}
-                    className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
-                  >
-                    Payer 50 €
-                  </button>
-                </div>
-              ) : (
-                <p className="text-green-600 font-semibold">Paiement confirmé !</p>
-              )}
-            </motion.div>
-          )}
-
-          {currentStep === 'confirmation' && (
-            <motion.div
-              key="confirmation"
-              initial="enter"
-              animate="center"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 className="text-green-700 font-bold mb-4">Demande envoyée avec succès !</h3>
-              <p className="mb-4 text-gray-700">
-                Nous avons bien reçu votre demande. Vous serez contacté par email sous 48h.
-              </p>
-              <button
-                onClick={resetAll}
-                className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
-              >
-                Nouvelle demande
-              </button>
-            </motion.div>
-          )}
+// ...existing code...
         </AnimatePresence>
       </div>
     </div>

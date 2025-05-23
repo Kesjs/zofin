@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import Breadcrumb from './components/Breadcrumb';
 import Loader from './components/Loader';
 
+
 function App() {
   const [loading, setLoading] = useState(true);
 

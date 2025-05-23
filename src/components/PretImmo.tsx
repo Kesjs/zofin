@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressBar } from './ProgressBar';
 
-type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'summary' | 'payment' | 'confirmation';
+type Step = 'intro' | 'conditions' | 'form' | 'documents' | 'summary' | 'confirmation';
 
 const LOCAL_STORAGE_KEY = 'pretImmoData';
 
@@ -23,7 +23,6 @@ const PretImmo: React.FC = () => {
   const [montant, setMontant] = useState('');
   const [duree, setDuree] = useState('');
   const [documents, setDocuments] = useState<File[]>([]);
-  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [docError, setDocError] = useState('');
 
   // Sauvegarde automatique dans le localStorage à chaque changement
@@ -39,7 +38,6 @@ const PretImmo: React.FC = () => {
       ville,
       montant,
       duree,
-      paymentConfirmed,
     };
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
   }, [
@@ -53,7 +51,6 @@ const PretImmo: React.FC = () => {
     ville,
     montant,
     duree,
-    paymentConfirmed,
   ]);
 
   // Restauration automatique au chargement
@@ -72,7 +69,6 @@ const PretImmo: React.FC = () => {
         setVille(data.ville || '');
         setMontant(data.montant || '');
         setDuree(data.duree || '');
-        setPaymentConfirmed(data.paymentConfirmed || false);
       } catch {
         // ignore erreur de parsing
       }
@@ -92,8 +88,7 @@ const PretImmo: React.FC = () => {
         case 'conditions': return 'form';
         case 'form': return 'documents';
         case 'documents': return 'summary';
-        case 'summary': return 'payment';
-        case 'payment': return 'confirmation';
+        case 'summary': return 'confirmation';
         default: return prev;
       }
     });
@@ -102,8 +97,7 @@ const PretImmo: React.FC = () => {
   const prevStep = useCallback(() => {
     setCurrentStep((prev) => {
       switch (prev) {
-        case 'confirmation': return 'payment';
-        case 'payment': return 'summary';
+        case 'confirmation': return 'summary';
         case 'summary': return 'documents';
         case 'documents': return 'form';
         case 'form': return 'conditions';
@@ -166,11 +160,6 @@ const PretImmo: React.FC = () => {
     nextStep();
   };
 
-  const handlePayment = () => {
-    setPaymentConfirmed(true);
-    nextStep();
-  };
-
   const resetAll = () => {
     setIsAccepted(false);
     setNom('');
@@ -182,7 +171,6 @@ const PretImmo: React.FC = () => {
     setMontant('');
     setDuree('');
     setDocuments([]);
-    setPaymentConfirmed(false);
     setDocError('');
     setCurrentStep('intro');
     localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -517,7 +505,8 @@ const PretImmo: React.FC = () => {
                 )}
               </div>
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm sm:text-base text-yellow-900 rounded">
-                Veuillez vérifier que toutes les informations ci-dessus sont correctes avant de procéder au paiement.
+                Veuillez vérifier que toutes les informations ci-dessus sont correctes avant de valider votre demande.<br />
+                <span className="font-semibold">La suite de la procédure se fera par email.</span>
               </div>
               <div className="flex flex-col sm:flex-row justify-between gap-3 mt-4">
                 <button
@@ -530,69 +519,87 @@ const PretImmo: React.FC = () => {
                   onClick={nextStep}
                   className="bg-blue-900 text-white px-6 py-2 rounded hover:bg-yellow-500 transition text-sm sm:text-base"
                 >
-                  ✅ Confirmer et payer
+                  ✅ Envoyer la demande
                 </button>
               </div>
             </motion.div>
           )}
 
-          {currentStep === 'payment' && (
-            <motion.div
-              key="payment"
-              initial="enter"
-              animate="center"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="mb-4 text-gray-700">
-                Veuillez procéder au paiement des frais de dossier pour que nous puissions traiter votre demande.
-              </p>
-              <p className="mb-6 font-semibold">
-                Montant à payer : 50 € (frais fixes)
-              </p>
-              {!paymentConfirmed ? (
-                <div className="flex justify-between">
-                  <button
-                    onClick={prevStep}
-                    className="px-4 py-2 border rounded hover:bg-gray-100 transition"
-                  >
-                    Retour
-                  </button>
-                  <button
-                    onClick={handlePayment}
-                    className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
-                  >
-                    Payer 50 €
-                  </button>
-                </div>
-              ) : (
-                <p className="text-green-600 font-semibold">Paiement confirmé !</p>
-              )}
-            </motion.div>
-          )}
-
-          {currentStep === 'confirmation' && (
-            <motion.div
-              key="confirmation"
-              initial="enter"
-              animate="center"
-              exit="exit"
-              variants={variants}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 className="text-green-700 font-bold mb-4">Demande envoyée avec succès !</h3>
-              <p className="mb-4 text-gray-700">
-                Nous avons bien reçu votre demande. Vous serez contacté par email sous 48h.
-              </p>
-              <button
-                onClick={resetAll}
-                className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
-              >
-                Nouvelle demande
-              </button>
-            </motion.div>
-          )}
+ // ...existing code...
+{currentStep === 'confirmation' && (
+  <motion.div
+    key="confirmation"
+    initial="enter"
+    animate="center"
+    exit="exit"
+    variants={variants}
+    transition={{ duration: 0.3 }}
+  >
+    {/* Numéro de dossier généré */}
+    <p className="mb-2 text-sm text-gray-500">
+      Numéro de dossier : <span className="font-mono">{Math.random().toString(36).substr(2, 8).toUpperCase()}</span>
+    </p>
+    <h3 className="text-green-700 font-bold mb-4 flex items-center">
+      <svg className="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+      Demande envoyée avec succès !
+    </h3>
+    <p className="mb-4 text-gray-700">
+      Merci <span className="font-semibold">{nom || "!"}</span>, nous avons bien reçu votre demande.<br />
+      <span className="font-semibold flex items-center mt-2">
+        <svg className="w-5 h-5 mr-1 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16 12H8m8 0a8 8 0 11-16 0 8 8 0 0116 0z" />
+        </svg>
+        La suite de la procédure se fera par email&nbsp;:
+        <a
+          href={`mailto:${email}`}
+          className="ml-1 text-blue-700 underline break-all"
+        >
+          {email || 'votre adresse email'}
+        </a>
+      </span>
+      <br />
+      <span className="block mt-2 text-sm text-gray-600">
+        Merci de vérifier votre boîte de réception (ainsi que les spams ou courriers indésirables) dans les prochaines minutes.<br />
+        Si vous ne recevez rien sous 24h, contactez notre support.<br />
+        <span className="block mt-2">
+          <strong>Délai estimé de traitement :</strong> sous 48h ouvrées.
+        </span>
+        <span className="block mt-2">
+          <a
+            href="mailto:support@votre-domaine.fr"
+            className="text-blue-700 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Contacter le support
+          </a>
+          {" "} | {" "}
+          <a
+            href="/faq"
+            className="text-blue-700 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Consulter la FAQ
+          </a>
+        </span>
+        <span className="block mt-2 text-xs text-gray-400">
+          Vos données sont traitées conformément à la réglementation RGPD et ne seront jamais partagées sans votre consentement.
+        </span>
+      </span>
+    </p>
+    <button
+      onClick={resetAll}
+      aria-label="Faire une nouvelle demande de prêt"
+      className="bg-blue-900 text-white px-5 py-2 rounded hover:bg-yellow-500 transition"
+    >
+      Nouvelle demande
+    </button>
+  </motion.div>
+)}
+// ...existing code...
         </AnimatePresence>
       </div>
     </div>

@@ -1,20 +1,19 @@
-// Home.tsx
-import Hero from '../components/Hero';  // Composant pour l'introduction
-import Services from '../components/Services';  // Composant pour les services
-import Contact from '../components/Contact';  // Composant pour le contact
+import Hero from '../components/Hero';
+import Services from '../components/Services';
+import Contact from '../components/Contact';
 import About from '../components/About';
-import NosOffres from '../pages/NosOffres'; // Assure-toi d'avoir un composant NosOffres
+import NosOffres from '../pages/NosOffres';
+import Faq from '../components/Faq'; // Ajout de l'import
 
 export default function Home() {
   return (
     <div>
-      <Hero />      {/* Section d'introduction */}
-      <Services />  {/* Section des services */}
+      <Hero />
+      <Services />
       <About />
-        <NosOffres />
-
-
-      <Contact />   {/* Section de contact */}
+      <NosOffres />
+      <Faq />      {/* Affichage direct de la FAQ sur la page d'accueil */}
+      <Contact />
     </div>
   );
 }

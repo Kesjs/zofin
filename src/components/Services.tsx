@@ -10,22 +10,26 @@ const loanServices = [
   {
     icon: CreditCard,
     title: 'Prêt Personnel',
-    description: 'Obtenez un prêt pour des projets personnels ou des besoins urgents.',
+    description:
+      'Obtenez un prêt adapté à vos projets personnels, qu’il s’agisse de travaux, d’études, ou de dépenses imprévues. Des conditions claires et un processus simplifié vous garantissent un financement rapide.',
   },
   {
     icon: Home,
     title: 'Prêt Immobilier',
-    description: 'Financez l’achat de votre maison ou appartement avec des taux compétitifs.',
+    description:
+      "Réalisez l’achat de votre maison ou appartement grâce à notre prêt immobilier aux taux avantageux. Profitez d’une offre sur-mesure avec un suivi expert tout au long de votre projet.",
   },
   {
     icon: DollarSign,
     title: 'Prêt Auto',
-    description: 'Accédez à un financement pour l’achat de votre véhicule neuf ou d’occasion.',
+    description:
+      "Financer l’achat de votre véhicule neuf ou d’occasion n’a jamais été aussi simple. Bénéficiez d’un prêt auto avec des mensualités adaptées à votre budget et des démarches simplifiées.",
   },
   {
     icon: Shield,
     title: 'Prêt Professionnel',
-    description: 'Solution de financement pour les entrepreneurs et les petites entreprises.',
+    description:
+      "Soutenez la croissance de votre entreprise grâce à notre prêt professionnel. Que vous soyez entrepreneur ou dirigeant de PME, bénéficiez d’un financement flexible et d’un accompagnement personnalisé.",
   },
 ];
 
@@ -42,23 +46,28 @@ export default function Services() {
     return isFinite(monthlyPayment) ? monthlyPayment.toFixed(2) : "0.00";
   };
 
-  const testimonials = [
-    {
-      name: 'Sophie L.',
-      feedback: 'Grâce à ce prêt, j’ai pu acheter ma maison de rêve. Le processus a été rapide et transparent.',
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-    },
-    {
-      name: 'Michel D.',
-      feedback: 'Un prêt simple et flexible pour acheter ma voiture. Les conditions étaient parfaites.',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      name: 'Julien R.',
-      feedback: 'Je recommande vivement. Le prêt professionnel m’a permis de financer mon entreprise.',
-      avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-    },
-  ];
+  // Témoignages 
+const testimonials = [
+  {
+    name: 'Sophie L.',
+    feedback:
+      "J’ai enfin pu devenir propriétaire grâce à ce prêt ! L'accompagnement a été exemplaire et les démarches ultra simples. Je recommande vivement.   ",
+    avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
+  },
+  {
+    name: 'Michel D.',
+    feedback:
+      "J’ai obtenu mon prêt auto très rapidement, sans tracas. Les conditions étaient excellentes, et j’ai pu acheter la voiture qu’il me fallait !",
+    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+  },
+  {
+    name: 'Julien R.',
+    feedback:
+      "Grâce au prêt professionnel, j’ai pu lancer mon activité sereinement. Un service rapide, fiable et transparent. Merci pour ce vrai coup de pouce !",
+    avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
+  },
+];
+
 
   const stats = [
     { label: 'Clients satisfaits', value: 8500, icon: Users },
@@ -93,7 +102,10 @@ export default function Services() {
   };
 
   return (
-    <section id="services" className="bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 py-20 text-gray-800">
+    <section
+      id="services"
+      className="bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 py-20 text-gray-800"
+    >
       <div className="container mx-auto px-4">
         {/* Titre Section */}
         <motion.div
@@ -104,8 +116,10 @@ export default function Services() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Nos Services de Prêt</h2>
+                          {/* <div className="border-t-4 border-yellow-500 w-16 flo"></div> */}
+
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Des solutions de financement personnalisées pour tous vos besoins
+            Nos services de prêt sont conçus pour s’adapter à vos besoins spécifiques, que ce soit pour financer un projet personnel, un achat immobilier, ou soutenir votre activité professionnelle. Grâce à des taux compétitifs, une approche transparente et un accompagnement personnalisé, nous vous offrons des solutions rapides et flexibles pour réaliser vos projets en toute sérénité.
           </p>
         </motion.div>
 
@@ -171,7 +185,9 @@ export default function Services() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Calculez votre Prêt</h2>
-          <p className="text-xl text-gray-700 mb-6">Estimez vos mensualités en quelques clics</p>
+          <p className="text-xl text-gray-700 mb-6">
+            Estimez vos mensualités en quelques clics grâce à notre calculateur simple et précis. Adaptez le montant, la durée et le taux d’intérêt pour obtenir une simulation personnalisée. Cette estimation vous aide à mieux planifier votre budget avant de faire votre demande de prêt.
+          </p>
 
           <div className="space-y-6 max-w-2xl mx-auto">
             <div>
@@ -221,42 +237,38 @@ export default function Services() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 px-4"
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">Avis de nos Clients</h2>
-          <div className="relative max-w-xl mx-auto bg-transparent p-6 rounded-xl shadow-lg text-center">
-            <button
-              onClick={goToPrev}
-              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow hover:bg-yellow-100"
-              aria-label="Témoignage précédent"
-              style={{ zIndex: 2 }}
-            >
-              <ChevronLeft className="w-5 h-5 text-yellow-600" />
-            </button>
-            <div aria-live="polite">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Avis de nos Clients</h2>
+          <p className="text-gray-700 max-w-xl mx-auto mb-8">
+            La satisfaction de nos clients est notre priorité. Découvrez leurs expériences et comment nos solutions de prêt leur ont permis de concrétiser leurs projets rapidement et en toute confiance.
+          </p>
+
+          <div className="max-w-xl mx-auto relative bg-white p-8 rounded-xl shadow-lg">
+            <div className="flex items-center justify-center mb-6">
               <img
                 src={testimonials[testimonialIndex].avatar}
-                alt={testimonials[testimonialIndex].name}
-                className="w-16 h-16 rounded-full mx-auto mb-4"
+                alt={`Avatar de ${testimonials[testimonialIndex].name}`}
+                className="w-16 h-16 rounded-full border-2 border-yellow-400"
               />
-              <h3 className="font-semibold text-gray-900 text-lg">{testimonials[testimonialIndex].name}</h3>
-              <p className="text-gray-600 italic">"{testimonials[testimonialIndex].feedback}"</p>
             </div>
-            <button
-              onClick={goToNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow hover:bg-yellow-100"
-              aria-label="Témoignage suivant"
-              style={{ zIndex: 2 }}
-            >
-              <ChevronRight className="w-5 h-5 text-yellow-600" />
-            </button>
-            <div className="flex justify-center mt-4 gap-2">
-              {testimonials.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setTestimonialIndex(idx)}
-                  className={`w-3 h-3 rounded-full ${testimonialIndex === idx ? 'bg-yellow-500' : 'bg-gray-300'}`}
-                  aria-label={`Aller au témoignage ${idx + 1}`}
-                />
-              ))}
+            <p className="italic text-gray-700 mb-4">"{testimonials[testimonialIndex].feedback}"</p>
+            <p className="font-semibold text-yellow-600">{testimonials[testimonialIndex].name}</p>
+
+            {/* Contrôles du carrousel */}
+            <div className="flex justify-between mt-8">
+              <button
+                aria-label="Précédent"
+                onClick={goToPrev}
+                className="p-2 rounded-full bg-yellow-100 hover:bg-yellow-300 transition-colors"
+              >
+                <ChevronLeft className="w-6 h-6 text-yellow-600" />
+              </button>
+              <button
+                aria-label="Suivant"
+                onClick={goToNext}
+                className="p-2 rounded-full bg-yellow-100 hover:bg-yellow-300 transition-colors"
+              >
+                <ChevronRight className="w-6 h-6 text-yellow-600" />
+              </button>
             </div>
           </div>
         </motion.div>

@@ -2,6 +2,40 @@ import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { useState } from 'react';
 
+// Ajout du balisage Schema.org pour le SEO (ContactPage + Organization)
+const contactJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "mainEntity": {
+    "@type": "Organization",
+    "name": "Zofin",
+    "url": "https://zofin.space",
+    "contactPoint": [
+      {
+        "@type": "ContactPoint",
+        "telephone": "+2290197914922",
+        "contactType": "customer support",
+        "areaServed": "BJ",
+        "availableLanguage": ["fr"]
+      },
+      {
+        "@type": "ContactPoint",
+        "email": "support-contact@zofin.space",
+        "contactType": "customer support",
+        "areaServed": "BJ",
+        "availableLanguage": ["fr"]
+      }
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "42 Avenue de la Marina",
+      "postalCode": "75008",
+      "addressLocality": "Cotonou",
+      "addressCountry": "BJ"
+    }
+  }
+};
+
 export default function Contact() {
   const [formStatus, setFormStatus] = useState('');
 
@@ -12,7 +46,13 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gradient-to-br from-yellow-100 via-white to-yellow-200">
+    <section
+      id="contact"
+      className="py-20 bg-gradient-to-br from-yellow-100 via-white to-yellow-200"
+      aria-label="Contact"
+    >
+      {/* SEO ContactPage JSON-LD */}
+      <script type="application/ld+json">{JSON.stringify(contactJsonLd)}</script>
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -20,7 +60,7 @@ export default function Contact() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-yellow-800 mb-4">Contactez-nous</h2>
+          <h1 className="text-4xl font-bold text-yellow-800 mb-4">Contactez-nous</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Un projet ? Une question ? Notre équipe vous répond avec réactivité et professionnalisme.
           </p>
@@ -39,7 +79,7 @@ export default function Contact() {
                 <Phone className="w-5 h-5" />
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-yellow-800">Téléphone</h3>
+                <h2 className="text-lg font-semibold text-yellow-800">Téléphone</h2>
                 <p className="text-gray-600">+229 0197914922</p>
               </div>
             </div>
@@ -49,8 +89,8 @@ export default function Contact() {
                 <Mail className="w-5 h-5" />
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-yellow-800">Email</h3>
-                <p className="text-gray-600">contact@finance-services.com</p>
+                <h2 className="text-lg font-semibold text-yellow-800">Email</h2>
+                <p className="text-gray-600">support-contact@zofin.space</p>
               </div>
             </div>
 
@@ -59,8 +99,8 @@ export default function Contact() {
                 <MapPin className="w-5 h-5" />
               </div>
               <div className="ml-4">
-                <h3 className="text-lg font-semibold text-yellow-800">Adresse</h3>
-                <p className="text-gray-600">42 Avenue de la Marina,75008 Cotonou</p>
+                <h2 className="text-lg font-semibold text-yellow-800">Adresse</h2>
+                <p className="text-gray-600">42 Avenue de la Marina, 75008 Cotonou</p>
               </div>
             </div>
           </motion.div>

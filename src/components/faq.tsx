@@ -51,9 +51,23 @@ const faqData = [
   {
     question: "Comment contacter le support client ?",
     answer:
-      "Vous pouvez nous joindre par téléphone au +229 0197914922, par email à contact@finance-services.com ou via le formulaire de contact du site.",
+      "Vous pouvez nous joindre par téléphone au +229 0197914922, par email à support-contact@zofin.space ou via le formulaire de contact du site.",
   },
 ];
+
+// Ajout du JSON-LD pour le balisage FAQPage SEO
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqData.map((item) => ({
+    "@type": "Question",
+    "name": item.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": item.answer,
+    },
+  })),
+};
 
 export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -76,8 +90,9 @@ export default function Faq() {
           onClick={() => setOpenIndex(openIndex === idx + offset ? null : idx + offset)}
           aria-expanded={openIndex === idx + offset}
           aria-controls={`faq-panel-${idx + offset}`}
+          id={`faq-question-${idx + offset}`}
         >
-          <span className="text-lg font-semibold text-yellow-900">{item.question}</span>
+          <h3 className="text-lg font-semibold text-yellow-900 m-0">{item.question}</h3>
           {openIndex === idx + offset ? (
             <ChevronUp className="w-5 h-5 text-yellow-600" />
           ) : (
@@ -88,6 +103,8 @@ export default function Faq() {
           {openIndex === idx + offset && (
             <motion.div
               id={`faq-panel-${idx + offset}`}
+              role="region"
+              aria-labelledby={`faq-question-${idx + offset}`}
               initial="collapsed"
               animate="open"
               exit="collapsed"
@@ -98,7 +115,7 @@ export default function Faq() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="overflow-hidden px-6"
             >
-              <div className="py-2 text-gray-700 text-base">{item.answer}</div>
+              <p className="py-2 text-gray-700 text-base">{item.answer}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -106,7 +123,13 @@ export default function Faq() {
     ));
 
   return (
-    <section id="faq" className="py-20 bg-gradient-to-br from-yellow-50 via-white to-yellow-100">
+    <section
+      id="faq"
+      className="py-20 bg-gradient-to-br from-yellow-50 via-white to-yellow-100"
+      aria-label="Foire aux questions"
+    >
+      {/* SEO FAQPage JSON-LD */}
+      <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       <div className="max-w-5xl mx-auto px-4">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

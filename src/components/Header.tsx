@@ -2,9 +2,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
-import { FaWhatsapp, FaPhoneAlt } from 'react-icons/fa';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const creditOffers = [
   { title: 'Prêt Personnel', href: '/nos-offres/pret-personnel' },
@@ -17,14 +17,12 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
-  const location = useLocation();
 
   const handleNosOffresClick = () => {
     setIsContentVisible(!isContentVisible);
     setShowDropdown(false);
   };
 
-  // Pour accessibilité clavier sur le menu mobile
   const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       setIsMenuOpen(!isMenuOpen);
@@ -128,7 +126,6 @@ export default function Header() {
                 <FaWhatsapp className="w-5 h-5 mr-2" />
                 <span>WhatsApp</span>
               </a>
-              
             </motion.div>
 
             {/* Mobile menu toggle */}
@@ -202,26 +199,6 @@ export default function Header() {
                     ))}
                   </motion.ul>
                 )}
-
-                {/* WhatsApp & Appel Mobile */}
-                <motion.div
-                  className="flex items-center bg-[#25D366] text-white px-4 py-2 rounded-full hover:bg-[#1EBE5D] transition-colors mt-2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <a
-                    href="https://wa.me/22997914922"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-white"
-                    aria-label="Contact WhatsApp"
-                  >
-                    <FaWhatsapp className="w-4 h-4 mr-2" />
-                    <span>WhatsApp</span>
-                  </a>
-                 
-                </motion.div>
               </div>
             </motion.div>
           )}
@@ -229,15 +206,27 @@ export default function Header() {
       </header>
 
       {/* Bouton WhatsApp flottant mobile uniquement */}
-      <a
+      <motion.a
         href="https://wa.me/22997914922"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-5 right-5 z-50 bg-[#25D366] text-white p-3 rounded-full shadow-lg md:hidden hover:bg-[#1EBE5D] transition-colors"
         aria-label="Contact via WhatsApp"
+        initial={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        className="
+          fixed bottom-5 right-5 z-50 
+          bg-[#25D366] text-white 
+          p-3 rounded-full 
+          shadow-lg
+          flex items-center justify-center
+          w-12 h-12
+          md:hidden
+          cursor-pointer
+        "
       >
         <FaWhatsapp className="w-6 h-6" />
-      </a>
+      </motion.a>
     </>
   );
 }

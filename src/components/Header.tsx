@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
 import { FaWhatsapp } from 'react-icons/fa';
+import { MdEmail } from 'react-icons/md';
+import { SiGmail } from 'react-icons/si';
+
 
 const creditOffers = [
   { title: 'Prêt Personnel', href: '/nos-offres/pret-personnel' },
@@ -154,25 +158,22 @@ export default function Header() {
                 </AnimatePresence>
               </div>
             </nav>
-
-            {/* WhatsApp & Appel Desktop */}
-            <motion.div
-              className="hidden md:flex items-center"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <a
-                href="https://wa.me/22997914922"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center bg-[#25D366] text-white px-4 py-2 rounded-full hover:bg-[#1EBE5D] transition-colors ml-4"
-                aria-label="Contact WhatsApp"
-              >
-                <FaWhatsapp className="w-5 h-5 mr-2" />
-                <span>WhatsApp</span>
-              </a>
-            </motion.div>
+{/* Email Desktop */}
+<motion.div
+  className="hidden md:flex items-center"
+  initial={{ opacity: 0, x: 20 }}
+  animate={{ opacity: 1, x: 0 }}
+  transition={{ duration: 0.5 }}
+>
+  <a
+    href="mailto:support-contact@zofin.space"
+    className="flex items-center bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors ml-4"
+    aria-label="Contact Email"
+  >
+    <SiGmail className="w-5 h-5 mr-2" />
+    <span>Email</span>
+  </a>
+</motion.div>
 
             {/* Mobile menu toggle */}
             <div className="md:hidden">
@@ -295,28 +296,27 @@ export default function Header() {
         </AnimatePresence>
       </header>
 
-      {/* Bouton WhatsApp flottant mobile uniquement */}
-      <motion.a
-        href="https://wa.me/22997914922"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Contact via WhatsApp"
-        initial={{ scale: 1 }}
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        className="
-          fixed bottom-5 right-5 z-50 
-          bg-[#25D366] text-white 
-          p-3 rounded-full 
-          shadow-lg
-          flex items-center justify-center
-          w-12 h-12
-          md:hidden
-          cursor-pointer
-        "
-      >
-        <FaWhatsapp className="w-6 h-6" />
-      </motion.a>
+   {/* Email flottant mobile */}
+<motion.a
+  href="mailto:support-contact@zofin.space"
+  aria-label="Contact via Email"
+  initial={{ scale: 1 }}
+  whileHover={{ scale: 1.1 }}
+  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+  className="
+    fixed bottom-5 right-5 z-50 
+    bg-yellow-400 text-black 
+    p-3 rounded-full 
+    shadow-lg
+    flex items-center justify-center
+    w-12 h-12
+    md:hidden
+    cursor-pointer
+  "
+>
+  <SiGmail className="w-6 h-6" />
+</motion.a>
+
     </>
   );
 }

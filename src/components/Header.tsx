@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -14,6 +13,9 @@ const creditOffers = [
 ];
 
 export default function Header() {
+  const location = useLocation();
+  const currentPath = location.pathname + location.hash;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isContentVisible, setIsContentVisible] = useState(false);
@@ -28,6 +30,10 @@ export default function Header() {
       setIsMenuOpen(!isMenuOpen);
     }
   };
+
+  function isActiveLink(to: string) {
+    return currentPath === to;
+  }
 
   return (
     <>
@@ -54,16 +60,48 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8 items-center">
-              <HashLink smooth to="/#hero" className="text-gray-600 hover:text-yellow-500 transition-colors">
+              <HashLink
+                smooth
+                to="/#hero"
+                className={`transition-colors ${
+                  isActiveLink('/#hero')
+                    ? 'text-yellow-600 font-semibold underline'
+                    : 'text-gray-600 hover:text-yellow-500'
+                }`}
+              >
                 Accueil
               </HashLink>
-              <HashLink smooth to="/#services" className="text-gray-600 hover:text-yellow-500 transition-colors">
+              <HashLink
+                smooth
+                to="/#services"
+                className={`transition-colors ${
+                  isActiveLink('/#services')
+                    ? 'text-yellow-600 font-semibold underline'
+                    : 'text-gray-600 hover:text-yellow-500'
+                }`}
+              >
                 Services
               </HashLink>
-              <HashLink smooth to="/#about" className="text-gray-600 hover:text-yellow-500 transition-colors">
+              <HashLink
+                smooth
+                to="/#about"
+                className={`transition-colors ${
+                  isActiveLink('/#about')
+                    ? 'text-yellow-600 font-semibold underline'
+                    : 'text-gray-600 hover:text-yellow-500'
+                }`}
+              >
                 À propos
               </HashLink>
-              <HashLink smooth to="/#contact" className="text-gray-600 hover:text-yellow-500 transition-colors">
+              <HashLink
+                smooth
+                to="/#contact"
+                className={`transition-colors ${
+                  isActiveLink('/#contact')
+                    ? 'text-yellow-600 font-semibold underline'
+                    : 'text-gray-600 hover:text-yellow-500'
+                }`}
+              >
                 Contact
               </HashLink>
 
@@ -74,7 +112,11 @@ export default function Header() {
                 onMouseLeave={() => setShowDropdown(false)}
               >
                 <motion.button
-                  className="flex items-center text-gray-600 hover:text-yellow-500 transition-all"
+                  className={`flex items-center transition-all ${
+                    location.pathname.startsWith('/nos-offres')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   onClick={handleNosOffresClick}
                   aria-label="Voir les offres de crédit"
@@ -95,7 +137,11 @@ export default function Header() {
                         <li key={index}>
                           <Link
                             to={offer.href}
-                            className="block px-4 py-2 text-gray-700 hover:bg-yellow-100 hover:text-yellow-600 transition-all"
+                            className={`block px-4 py-2 transition-all ${
+                              location.pathname === offer.href
+                                ? 'bg-yellow-200 text-yellow-600 font-semibold'
+                                : 'text-gray-800 hover:bg-yellow-200 hover:text-yellow-600'
+                            }`}
                             onClick={() => setShowDropdown(false)}
                             aria-label={offer.title}
                           >
@@ -133,7 +179,7 @@ export default function Header() {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-gray-600 hover:text-yellow-500"
-                aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+                aria-label={isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
                 tabIndex={0}
                 onKeyDown={handleMenuKeyDown}
               >
@@ -151,25 +197,65 @@ export default function Header() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden absolute left-0 right-0 top-20 bg-white bg-opacity-95 shadow-lg z-40"
+              className="md:hidden absolute left-0 right-0 top-20 bg-white bg-opacity-95 shadow-lg z-40 hover:bg-gray-100"
             >
               <div className="space-y-4 px-4 py-4 flex flex-col items-center">
-                <HashLink smooth to="/#hero" className="block text-gray-600 hover:text-yellow-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <HashLink
+                  smooth
+                  to="/#hero"
+                  className={`block transition-colors ${
+                    isActiveLink('/#hero')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Accueil
                 </HashLink>
-                <HashLink smooth to="/#services" className="block text-gray-600 hover:text-yellow-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <HashLink
+                  smooth
+                  to="/#services"
+                  className={`block transition-colors ${
+                    isActiveLink('/#services')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Services
                 </HashLink>
-                <HashLink smooth to="/#about" className="block text-gray-600 hover:text-yellow-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <HashLink
+                  smooth
+                  to="/#about"
+                  className={`block transition-colors ${
+                    isActiveLink('/#about')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   À propos
                 </HashLink>
-                <HashLink smooth to="/#contact" className="block text-gray-600 hover:text-yellow-500 transition-colors" onClick={() => setIsMenuOpen(false)}>
+                <HashLink
+                  smooth
+                  to="/#contact"
+                  className={`block transition-colors ${
+                    isActiveLink('/#contact')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   Contact
                 </HashLink>
 
                 {/* Nos offres mobile */}
                 <motion.button
-                  className="flex items-center text-gray-600 hover:text-yellow-500 transition-all"
+                  className={`flex items-center transition-all ${
+                    location.pathname.startsWith('/nos-offres')
+                      ? 'text-yellow-600 font-semibold underline'
+                      : 'text-gray-600 hover:text-yellow-500'
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   onClick={handleNosOffresClick}
                   aria-label="Voir les offres de crédit"
@@ -189,7 +275,11 @@ export default function Header() {
                       <li key={index}>
                         <Link
                           to={offer.href}
-                          className="block px-4 py-2 text-gray-700 hover:bg-yellow-100 hover:text-yellow-600 transition-all"
+                          className={`block px-4 py-2 transition-all ${
+                            location.pathname === offer.href
+                              ? 'bg-yellow-200 text-yellow-600 font-semibold'
+                              : 'text-gray-700 hover:bg-yellow-100 hover:text-yellow-600'
+                          }`}
                           onClick={() => setIsMenuOpen(false)}
                           aria-label={offer.title}
                         >

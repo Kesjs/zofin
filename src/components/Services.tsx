@@ -5,6 +5,7 @@ import { CreditCard, Home, DollarSign, Shield, ChevronLeft, ChevronRight } from 
 import { useState, useEffect } from 'react';
 import CountUp from 'react-countup';
 import { Users, Banknote, CheckCircle2, FileText } from 'lucide-react';
+import HowItWorks from './HowItWorks';
 
 const loanServices = [
   {
@@ -107,6 +108,7 @@ const testimonials = [
       className="bg-gradient-to-br from-yellow-50 via-yellow-100 to-yellow-200 py-20 text-gray-800"
     >
       <div className="container mx-auto px-4">
+        <HowItWorks />
         {/* Titre Section */}
         <motion.div
           ref={ref}

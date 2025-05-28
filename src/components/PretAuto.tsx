@@ -423,27 +423,29 @@ const PretAuto: React.FC = () => {
                     required
                   />
                 </div>
-                <div className="mb-4">
+                           <div className="mb-4">
                   <label className="block mb-1 text-gray-700">Montant souhaité (€)</label>
-                  <input
-                    type="number"
-                    value={montant}
-                    onChange={(e) => setMontant(e.target.value)}
-                    className="w-full border px-3 py-2 rounded"
-                    required
-                    min={1}
-                  />
+                 <input
+  type="number"
+  value={montant}
+  onChange={(e) => setMontant(e.target.value)}
+  className="w-full border px-3 py-2 rounded"
+  required
+  min={1000}
+  max={50000}
+/>
                 </div>
                 <div className="mb-6">
                   <label className="block mb-1 text-gray-700">Durée du prêt (mois)</label>
-                  <input
-                    type="number"
-                    value={duree}
-                    onChange={(e) => setDuree(e.target.value)}
-                    className="w-full border px-3 py-2 rounded"
-                    required
-                    min={1}
-                  />
+                <input
+  type="number"
+  value={duree}
+  onChange={(e) => setDuree(e.target.value)}
+  className="w-full border px-3 py-2 rounded"
+  required
+  min={6}
+  max={84}
+/>
                 </div>
                 <div className="flex justify-between">
                   <button

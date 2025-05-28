@@ -9,13 +9,15 @@ export default function Hero() {
   const backgroundImage =
     'https://enterprisectr.org/wp-content/uploads/2019/08/9-24-19-Business-Financials-PURCHASED-scaled.jpeg';
 
- useEffect(() => {
-  const img = new Image();
-  img.src = backgroundImage;
-  img.onload = () => setBgLoaded(true);
-  img.onerror = () => setBgLoaded(true); // pour ne pas bloquer si erreur
-}, []);
+  useEffect(() => {
+    const img = new Image();
+    img.src = backgroundImage;
+    img.onload = () => setBgLoaded(true);
+    img.onerror = () => setBgLoaded(true); // pour ne pas bloquer si erreur
 
+    // Déclenche une annonce toast à l'arrivée sur la page
+    
+  }, []);
 
   return (
     <section
@@ -38,17 +40,7 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1, ease: 'easeOut' }}
       >
-        {/* Bandeau annonce promo */}
-        <motion.div
-          className="mb-6 px-4 py-2 bg-yellow-300 text-black font-semibold rounded-full inline-block shadow-md text-sm sm:text-base cursor-pointer"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          role="alert"
-          aria-live="polite"
-        >
-          🎉 Offre spéciale : Taux réduit ce mois-ci ! Profitez-en vite.
-        </motion.div>
+        
 
         <motion.h1
           className="text-3xl sm:text-5xl font-extrabold leading-tight mb-5"

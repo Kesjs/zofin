@@ -150,15 +150,26 @@ export default function Footer() {
     
 
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400"
-        >
-          <p>
-            &copy; {new Date().getFullYear()} Zofin. Tous droits réservés.
-          </p>
-        </motion.div>
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  transition={{ duration: 0.6, delay: 0.4 }}
+  className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400 space-y-2"
+>
+  <p>
+    &copy; {new Date().getFullYear()} Zofin. Tous droits réservés.
+  </p>
+  <p className="text-sm">
+    <Link to="/conditions-utilisation" className="underline text-blue-400 hover:text-yellow-400">
+      Conditions d'utilisation
+    </Link>{' '}
+    |{' '}
+    <Link to="/politique-de-confidentialite" className="underline text-blue-400 hover:text-yellow-400">
+      Politique de confidentialité
+    </Link>
+    . Vous disposez d’un droit d’accès, de rectification et de suppression de vos données.
+  </p>
+</motion.div>
+
       </div>
     </footer>
   );
